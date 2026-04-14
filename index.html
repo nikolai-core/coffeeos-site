@@ -103,7 +103,8 @@ h1 .acc{color:var(--crema);font-style:italic;}
 .dot.y{background:#febc2e;box-shadow:0 0 5px rgba(254,188,46,.3);}
 .dot.g{background:#28c840;box-shadow:0 0 5px rgba(40,200,64,.3);}
 .t-bar-title{flex:1;text-align:center;font-size:.58rem;color:rgba(240,230,210,.2);letter-spacing:.08em;}
-.t-body{padding:1.2rem 1.4rem;font-size:.72rem;line-height:2.1;min-height:260px;}
+.t-body{padding:1.2rem 1.4rem;font-size:.72rem;line-height:2.1;height:260px;overflow-y:auto;scroll-behavior:smooth;}
+.t-body::-webkit-scrollbar{width:3px;}.t-body::-webkit-scrollbar-track{background:transparent;}.t-body::-webkit-scrollbar-thumb{background:rgba(201,170,112,.18);border-radius:2px;}
 .pr{color:rgba(201,170,112,.55);}.pc{color:var(--cream);}.pg{color:var(--ag);}
 .pt{color:var(--at);}.pp{color:var(--ap);}.pd{color:rgba(240,230,210,.3);}.pa{color:var(--crema);}
 .t-ln{display:block;}.cur{display:inline-block;width:6px;height:13px;background:var(--crema);
@@ -189,7 +190,7 @@ h2 em{color:var(--crema);font-style:italic;}
 .rm-desc{font-size:.68rem;color:rgba(240,230,210,.4);line-height:1.75;}
 
 /* ── CREDITS SECTION ── */
-.credits-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;max-width:620px;}
+.credits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;max-width:960px;}
 .credit-card{background:rgba(20,13,7,.55);border:1px solid var(--border);border-radius:8px;
   padding:1.8rem;display:flex;flex-direction:column;gap:1rem;transition:border-color .3s,background .3s;position:relative;overflow:hidden;}
 .credit-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,170,112,.03),transparent);pointer-events:none;}
@@ -197,6 +198,7 @@ h2 em{color:var(--crema);font-style:italic;}
 .credit-role{font-size:.57rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.2rem;}
 .credit-role.creator{color:var(--crema);}
 .credit-role.tester{color:var(--at);}
+.credit-role.alpha{color:var(--ap);}
 .credit-name{font-family:'DM Serif Display',serif;font-size:1.35rem;color:var(--cream);line-height:1;}
 .credit-handle{display:inline-flex;align-items:center;gap:.35rem;font-size:.68rem;color:rgba(240,230,210,.38);
   letter-spacing:.04em;text-decoration:none;transition:color .25s;margin-top:.2rem;}
@@ -205,6 +207,7 @@ h2 em{color:var(--crema);font-style:italic;}
 .credit-badge{display:inline-block;margin-top:.5rem;font-size:.6rem;padding:.2rem .7rem;border-radius:3px;letter-spacing:.06em;}
 .credit-badge.creator{background:rgba(201,170,112,.08);color:var(--crema);border:1px solid rgba(201,170,112,.18);}
 .credit-badge.tester{background:rgba(0,229,255,.06);color:var(--at);border:1px solid rgba(0,229,255,.15);}
+.credit-badge.alpha{background:rgba(181,122,255,.07);color:var(--ap);border:1px solid rgba(181,122,255,.18);}
 
 /* ── CTA ── */
 .cta{text-align:center;padding:9rem 0;position:relative;}
@@ -255,6 +258,7 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
   .burger{display:flex;}
   .foot-top{flex-direction:column;}
   .foot-cols{gap:2.5rem;}
+  .credits-grid{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:600px){
   .feat-grid{grid-template-columns:1fr;}
@@ -583,7 +587,7 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
     <div class="reveal">
       <p class="sec-eye">The team</p>
       <h2>Built by <em>humans.</em></h2>
-      <p class="sec-p">Every line of coffeeOS was written by one person, with one tester brave enough to run it on real hardware.</p>
+      <p class="sec-p">Every line of coffeeOS was written by one person — with a beta tester brave enough to run it on real hardware, and an alpha tester who pushed the app layer to its limits.</p>
     </div>
     <div class="credits-grid reveal">
 
@@ -609,6 +613,18 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
           </a>
         </div>
         <span class="credit-badge tester">Aurora Refresh v1.3</span>
+      </div>
+
+      <div class="credit-card">
+        <div>
+          <p class="credit-role alpha">Alpha Tester · App Developer</p>
+          <p class="credit-name">Anantha Renjith</p>
+          <span class="credit-handle" style="cursor:default;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            Pre-release Program
+          </span>
+        </div>
+        <span class="credit-badge alpha">Aurora Refresh v1.3 — Pre-release</span>
       </div>
 
     </div>
@@ -670,6 +686,7 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
           <h4>Team</h4>
           <a href="https://www.instagram.com/johannnnn._/" target="_blank">@johannnnn._ (Creator)</a>
           <a href="https://www.instagram.com/its_rayan2580/" target="_blank">@its_rayan2580 (Beta)</a>
+          <a href="#credits">Anantha Renjith (Alpha)</a>
         </div>
       </div>
     </div>
@@ -679,6 +696,8 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
         Created by <a href="https://www.instagram.com/johannnnn._/" target="_blank">Johan Joseph</a>
         &nbsp;·&nbsp;
         Beta tested by <a href="https://www.instagram.com/its_rayan2580/" target="_blank">Rayan Abdulsalam</a>
+        &nbsp;·&nbsp;
+        Alpha tested by <a href="#credits">Anantha Renjith</a>
       </span>
     </div>
   </div>
@@ -801,7 +820,7 @@ function nextLine(){
   if(l.type==='blank'){
     const s=document.createElement('span');s.className='t-ln';s.innerHTML='&nbsp;';
     body.insertBefore(s,body.querySelector('.cur')?.parentElement||null);
-    body.lastElementChild&&body.lastElementChild.scrollIntoView({block:'nearest'});
+    body.scrollTop=body.scrollHeight;
     lineIdx++;charIdx=0;setTimeout(nextLine,80);return;
   }
   if(charIdx===0){
@@ -821,7 +840,7 @@ function nextLine(){
     const pause=l.prompt?PROMPT_PAUSE:LINE_PAUSE;
     setTimeout(nextLine,pause);
   }
-  body.lastElementChild&&body.lastElementChild.scrollIntoView({block:'nearest'});
+  body.scrollTop=body.scrollHeight;
 }
 let s;
 setTimeout(nextLine,900);
