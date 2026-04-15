@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>coffeeOS — Aurora Refresh v1.3</title>
+<title>coffeeOS — Aurora Refresh v1.4</title>
 <meta name="description" content="A 32-bit x86 hobby OS brewed from scratch — framebuffer desktop, FAT32, RTL8139 networking, SB16 audio. Open source.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,8 +13,8 @@
   --espresso:#0c0805;--roast:#181008;--brew:#201409;--mug:#251808;
   --crema:#c9aa70;--cream:#f0e6d2;--milk:#ecdfc6;--latte:#d4bc8a;
   --ag:#3dffc0;--at:#00e5ff;--ap:#b57aff;--ab:#4fc8ff;--ar:#ff7070;
-  --border:rgba(201,170,112,.14);--border2:rgba(201,170,112,.22);--dim:rgba(201,170,112,.07);
-  --glow-g:rgba(61,255,192,.18);--glow-t:rgba(0,229,255,.15);
+  --border:rgba(201,170,112,.14);--border2:rgba(201,170,112,.24);--dim:rgba(201,170,112,.07);
+  --glow-g:rgba(61,255,192,.18);--glow-t:rgba(0,229,255,.15);--glow-p:rgba(181,122,255,.15);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -22,33 +22,41 @@ body{background:var(--espresso);color:var(--cream);font-family:'JetBrains Mono',
 
 /* ── SCROLL PROGRESS ── */
 #progress-bar{position:fixed;top:0;left:0;height:2px;width:0%;
-  background:linear-gradient(90deg,var(--ag),var(--at),var(--ap));z-index:9999;transition:width .1s linear;}
+  background:linear-gradient(90deg,var(--ag),var(--at),var(--ap));z-index:9999;transition:width .1s linear;
+  box-shadow:0 0 8px rgba(61,255,192,.4);}
 
 /* ── AURORA BG ── */
 #aurora{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* Grain overlay */
 body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  opacity:.28;}
+  opacity:.22;}
+
+/* CRT scanlines */
+body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);
+  opacity:1;}
+
 .z{position:relative;z-index:2;}
 .container{max-width:1100px;margin:0 auto;padding:0 2rem;}
 
 /* ── NAV ── */
 nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:0;
-  background:rgba(12,8,5,.85);backdrop-filter:blur(14px) saturate(1.2);
+  background:rgba(12,8,5,.88);backdrop-filter:blur(18px) saturate(1.4);
   border-bottom:1px solid var(--border);}
 nav .container{display:flex;align-items:center;justify-content:space-between;height:60px;}
 .logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;}
 .logo svg{width:28px;height:28px;}
 .logo-name{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--crema);letter-spacing:.02em;}
 .logo-ver{font-size:.58rem;letter-spacing:.1em;color:var(--ag);background:rgba(61,255,192,.07);
-  border:1px solid rgba(61,255,192,.2);padding:.1rem .42rem;border-radius:2px;white-space:nowrap;}
+  border:1px solid rgba(61,255,192,.22);padding:.1rem .42rem;border-radius:2px;white-space:nowrap;}
 nav ul{list-style:none;display:flex;align-items:center;gap:2rem;}
-nav a{color:rgba(240,230,210,.4);text-decoration:none;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;transition:color .25s;}
+nav a{color:rgba(240,230,210,.38);text-decoration:none;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;transition:color .25s;}
 nav a:hover,nav a.active{color:var(--crema);}
 .nav-gh{background:rgba(201,170,112,.08)!important;border:1px solid rgba(201,170,112,.22)!important;
   padding:.38rem .95rem!important;border-radius:3px!important;color:var(--crema)!important;display:inline-flex;align-items:center;gap:.4rem;}
 .nav-gh:hover{background:rgba(201,170,112,.16)!important;}
-/* hamburger */
 .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.5rem;background:none;border:none;}
 .burger span{display:block;width:22px;height:1.5px;background:var(--crema);transition:transform .3s,opacity .3s;}
 .burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
@@ -66,9 +74,30 @@ nav a:hover,nav a.active{color:var(--crema);}
 .eyebrow{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ag);margin-bottom:1.5rem;
   opacity:0;animation:fup .8s ease .2s forwards;display:flex;align-items:center;gap:.5rem;}
 .eyebrow::before{content:'';width:22px;height:1px;background:var(--ag);opacity:.45;}
+
+/* GLITCH */
 h1{font-family:'DM Serif Display',serif;font-size:clamp(3.2rem,7vw,6.2rem);line-height:.93;color:var(--cream);
-  opacity:0;animation:fup .8s ease .35s forwards;letter-spacing:-.01em;}
+  opacity:0;animation:fup .8s ease .35s forwards;letter-spacing:-.01em;position:relative;}
 h1 .acc{color:var(--crema);font-style:italic;}
+.glitch{position:relative;display:inline-block;}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;height:100%;
+  font-family:'DM Serif Display',serif;font-size:inherit;line-height:inherit;color:var(--cream);pointer-events:none;}
+.glitch::before{left:2px;text-shadow:-1px 0 var(--ag);animation:glitch1 5s infinite steps(1);}
+.glitch::after{left:-2px;text-shadow:1px 0 var(--ap);animation:glitch2 5s infinite steps(1);}
+@keyframes glitch1{
+  0%,90%,100%{clip-path:inset(100% 0 0 0);opacity:0;}
+  91%{clip-path:inset(20% 0 60% 0);opacity:.7;}
+  92%{clip-path:inset(60% 0 10% 0);opacity:.7;}
+  93%{clip-path:inset(40% 0 40% 0);opacity:.7;}
+  94%{clip-path:inset(100% 0 0 0);opacity:0;}
+}
+@keyframes glitch2{
+  0%,92%,100%{clip-path:inset(100% 0 0 0);opacity:0;}
+  93%{clip-path:inset(30% 0 50% 0);opacity:.6;}
+  94%{clip-path:inset(70% 0 5% 0);opacity:.6;}
+  95%{clip-path:inset(100% 0 0 0);opacity:0;}
+}
+
 .hero-sub{font-family:'DM Serif Display',serif;font-size:clamp(1.1rem,2.2vw,1.7rem);
   color:rgba(240,230,210,.28);margin-bottom:2rem;opacity:0;animation:fup .8s ease .45s forwards;letter-spacing:.02em;}
 .hero-p{font-size:.78rem;line-height:2;color:rgba(240,230,210,.52);max-width:420px;margin-bottom:2.5rem;
@@ -77,27 +106,28 @@ h1 .acc{color:var(--crema);font-style:italic;}
 .btn-p{display:inline-flex;align-items:center;gap:.5rem;background:var(--crema);color:var(--espresso);
   text-decoration:none;font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
   padding:.82rem 1.7rem;border-radius:3px;transition:background .25s,transform .2s,box-shadow .25s;}
-.btn-p:hover{background:var(--milk);transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,170,112,.2);}
+.btn-p:hover{background:var(--milk);transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,170,112,.25);}
 .btn-g{display:inline-flex;align-items:center;gap:.5rem;background:transparent;color:rgba(240,230,210,.7);
   text-decoration:none;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
   padding:.82rem 1.7rem;border:1px solid var(--border2);border-radius:3px;transition:border-color .25s,background .25s,color .25s;}
 .btn-g:hover{border-color:rgba(201,170,112,.45);background:var(--dim);color:var(--crema);}
 
-/* ── STEAM ── */
-.steam-wrap{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);pointer-events:none;}
-.steam{stroke:rgba(201,170,112,.22);fill:none;stroke-width:1.5;stroke-linecap:round;}
-@keyframes rise{0%{transform:translateY(0) scaleX(1);opacity:.5}
-  50%{transform:translateY(-18px) scaleX(.85);opacity:.3}
-  100%{transform:translateY(-35px) scaleX(.7);opacity:0}}
-.s1{animation:rise 2.4s ease-in-out infinite;}
-.s2{animation:rise 2.4s ease-in-out .8s infinite;}
-.s3{animation:rise 2.4s ease-in-out 1.6s infinite;}
+/* ── NEW: HERO BADGE ── */
+.new-badge{display:inline-flex;align-items:center;gap:.45rem;
+  background:rgba(61,255,192,.06);border:1px solid rgba(61,255,192,.2);
+  padding:.28rem .75rem;border-radius:20px;font-size:.6rem;letter-spacing:.1em;
+  color:var(--ag);margin-bottom:1.2rem;opacity:0;animation:fup .8s ease .1s forwards;}
+.new-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--ag);
+  box-shadow:0 0 6px var(--ag);animation:pulse-dot 1.8s ease infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.4;}}
 
 /* ── TERMINAL ── */
 .term-wrap{opacity:0;animation:fup .8s ease .45s forwards;}
-.terminal{background:rgba(10,7,4,.92);border:1px solid var(--border2);border-radius:10px;overflow:hidden;
-  box-shadow:0 32px 80px rgba(0,0,0,.65),0 0 0 1px rgba(201,170,112,.04);}
-.t-bar{background:rgba(20,13,7,.98);padding:.65rem .95rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);}
+.terminal{background:rgba(8,5,3,.95);border:1px solid var(--border2);border-radius:10px;overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(201,170,112,.04),0 0 60px rgba(61,255,192,.04);
+  transition:box-shadow .4s;}
+.terminal:hover{box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(201,170,112,.06),0 0 80px rgba(61,255,192,.07);}
+.t-bar{background:rgba(18,11,6,.98);padding:.65rem .95rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);}
 .dot{width:11px;height:11px;border-radius:50%;cursor:default;}
 .dot.r{background:#ff5f57;box-shadow:0 0 5px rgba(255,95,87,.3);}
 .dot.y{background:#febc2e;box-shadow:0 0 5px rgba(254,188,46,.3);}
@@ -132,9 +162,13 @@ h2 em{color:var(--crema);font-style:italic;}
 .feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
 .feat{background:var(--espresso);padding:2.2rem 1.7rem;position:relative;overflow:hidden;transition:background .3s;}
 .feat::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
-  background:linear-gradient(90deg,transparent,var(--ag),transparent);opacity:0;transition:opacity .3s;}
+  background:linear-gradient(90deg,transparent,var(--feat-accent, var(--ag)),transparent);opacity:0;transition:opacity .3s;}
+.feat::after{content:'';position:absolute;bottom:0;left:0;right:0;top:0;
+  background:radial-gradient(ellipse at top left,var(--feat-glow,rgba(61,255,192,.04)),transparent 65%);
+  opacity:0;transition:opacity .4s;pointer-events:none;}
 .feat:hover{background:var(--roast);}
 .feat:hover::before{opacity:1;}
+.feat:hover::after{opacity:1;}
 .feat-ico{margin-bottom:1.3rem;}
 .feat-ico svg{width:34px;height:34px;}
 .feat h3{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--crema);margin-bottom:.5rem;}
@@ -150,7 +184,8 @@ h2 em{color:var(--crema);font-style:italic;}
 /* ── BUILD ── */
 .two-col{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:start;}
 .build-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
-.build-card{background:rgba(20,13,7,.55);border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+.build-card{background:rgba(20,13,7,.55);border:1px solid var(--border);border-radius:7px;overflow:hidden;transition:border-color .3s;}
+.build-card:hover{border-color:var(--border2);}
 .build-head{padding:.6rem 1rem;border-bottom:1px solid var(--border);font-size:.58rem;letter-spacing:.14em;
   color:rgba(240,230,210,.28);text-transform:uppercase;background:rgba(10,7,4,.4);display:flex;align-items:center;justify-content:space-between;}
 .build-body{padding:1rem 1.1rem;}
@@ -158,16 +193,31 @@ h2 em{color:var(--crema);font-style:italic;}
 .cmd-sym{color:rgba(61,255,192,.38);font-size:.68rem;flex-shrink:0;}
 .cmd-text{color:var(--ag);}
 .cmd-c{color:rgba(240,230,210,.22);font-size:.64rem;}
-/* copy button */
 .copy-btn{background:none;border:1px solid transparent;color:rgba(240,230,210,.22);font-size:.6rem;
   font-family:'JetBrains Mono',monospace;cursor:pointer;padding:.12rem .5rem;border-radius:2px;letter-spacing:.06em;transition:all .25s;}
 .copy-btn:hover{border-color:var(--border2);color:var(--crema);}
 .copy-btn.copied{color:var(--ag);border-color:rgba(61,255,192,.3);}
 
+/* ── CHANGELOG ── */
+#changelog{background:rgba(16,10,5,.6);}
+.cl-list{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.cl-item{background:var(--espresso);padding:1.5rem 2rem;display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:start;transition:background .3s;}
+.cl-item:hover{background:var(--roast);}
+.cl-ver{font-size:.62rem;letter-spacing:.12em;color:rgba(240,230,210,.3);white-space:nowrap;padding-top:.12rem;}
+.cl-ver strong{display:block;font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--crema);margin-bottom:.08rem;font-weight:400;}
+.cl-ver.now strong{color:var(--ag);}
+.cl-changes{display:flex;flex-direction:column;gap:.6rem;}
+.cl-tag{display:inline-block;font-size:.56rem;padding:.08rem .45rem;border-radius:2px;margin-right:.3rem;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle;}
+.cl-tag.fix{background:rgba(0,229,255,.06);color:var(--at);border:1px solid rgba(0,229,255,.14);}
+.cl-tag.new{background:rgba(61,255,192,.06);color:var(--ag);border:1px solid rgba(61,255,192,.14);}
+.cl-tag.upd{background:rgba(201,170,112,.08);color:var(--crema);border:1px solid rgba(201,170,112,.17);}
+.cl-line{font-size:.7rem;color:rgba(240,230,210,.5);line-height:1.7;}
+
 /* ── SPECS ── */
 .spec-table{border:1px solid var(--border);border-radius:7px;overflow:hidden;font-size:.72rem;}
-.spec-row{display:grid;grid-template-columns:1.1fr 1.5fr;border-bottom:1px solid var(--border);}
+.spec-row{display:grid;grid-template-columns:1.1fr 1.5fr;border-bottom:1px solid var(--border);transition:background .25s;}
 .spec-row:last-child{border-bottom:none;}
+.spec-row:hover{background:var(--dim);}
 .sk{padding:.82rem 1.1rem;color:rgba(240,230,210,.35);border-right:1px solid var(--border);background:rgba(20,13,7,.45);}
 .sv{padding:.82rem 1.1rem;color:var(--cream);}
 .tag{display:inline-block;font-size:.58rem;padding:.1rem .42rem;border-radius:2px;margin-right:.2rem;letter-spacing:.04em;}
@@ -192,9 +242,9 @@ h2 em{color:var(--crema);font-style:italic;}
 /* ── CREDITS SECTION ── */
 .credits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;max-width:960px;}
 .credit-card{background:rgba(20,13,7,.55);border:1px solid var(--border);border-radius:8px;
-  padding:1.8rem;display:flex;flex-direction:column;gap:1rem;transition:border-color .3s,background .3s;position:relative;overflow:hidden;}
+  padding:1.8rem;display:flex;flex-direction:column;gap:1rem;transition:border-color .3s,background .3s,transform .3s;position:relative;overflow:hidden;}
 .credit-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,170,112,.03),transparent);pointer-events:none;}
-.credit-card:hover{border-color:var(--border2);background:rgba(25,16,8,.7);}
+.credit-card:hover{border-color:var(--border2);background:rgba(25,16,8,.7);transform:translateY(-3px);}
 .credit-role{font-size:.57rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.2rem;}
 .credit-role.creator{color:var(--crema);}
 .credit-role.tester{color:var(--at);}
@@ -212,8 +262,7 @@ h2 em{color:var(--crema);font-style:italic;}
 /* ── CTA ── */
 .cta{text-align:center;padding:9rem 0;position:relative;}
 .cta::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:600px;height:300px;background:radial-gradient(ellipse,rgba(201,170,112,.04) 0%,transparent 70%);
-  pointer-events:none;}
+  width:700px;height:350px;background:radial-gradient(ellipse,rgba(201,170,112,.05) 0%,transparent 70%);pointer-events:none;}
 .cta h2{font-size:clamp(2.6rem,5.5vw,4.6rem);margin-bottom:1.2rem;}
 .cta p{font-size:.78rem;color:rgba(240,230,210,.42);max-width:480px;margin:0 auto 2.6rem;line-height:2;}
 .cta p code{color:var(--ag);font-size:.74rem;}
@@ -233,14 +282,14 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
 .foot-col a:hover{color:var(--crema);}
 .foot-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:1.8rem;border-top:1px solid rgba(201,170,112,.07);}
 .foot-note{font-size:.6rem;color:rgba(240,230,210,.18);}
-.foot-credit{font-size:.6rem;color:rgba(240,230,210,.22);display:flex;align-items:center;gap:.35rem;}
+.foot-credit{font-size:.6rem;color:rgba(240,230,210,.22);display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;}
 .foot-credit a{color:rgba(240,230,210,.35);text-decoration:none;transition:color .25s;}
 .foot-credit a:hover{color:var(--crema);}
 
 /* ── REVEAL ANIMATIONS ── */
-.reveal{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .95s cubic-bezier(.16,1,.3,1),transform .95s cubic-bezier(.16,1,.3,1);}
 .reveal.on{opacity:1;transform:translateY(0);}
-.reveal-l{opacity:0;transform:translateX(-24px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+.reveal-l{opacity:0;transform:translateX(-28px);transition:opacity .95s cubic-bezier(.16,1,.3,1),transform .95s cubic-bezier(.16,1,.3,1);}
 .reveal-l.on{opacity:1;transform:translateX(0);}
 @keyframes fup{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}
 
@@ -259,6 +308,7 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
   .foot-top{flex-direction:column;}
   .foot-cols{gap:2.5rem;}
   .credits-grid{grid-template-columns:1fr 1fr;}
+  .cl-item{grid-template-columns:1fr;gap:.8rem;}
 }
 @media(max-width:600px){
   .feat-grid{grid-template-columns:1fr;}
@@ -267,15 +317,13 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
   .credits-grid{grid-template-columns:1fr;}
   .foot-cols{flex-direction:column;gap:1.8rem;}
   .foot-bottom{flex-direction:column;gap:.8rem;text-align:center;}
+  .foot-credit{justify-content:center;}
 }
 </style>
 </head>
 <body>
 
-<!-- Scroll progress -->
 <div id="progress-bar"></div>
-
-<!-- Aurora canvas -->
 <canvas id="aurora"></canvas>
 
 <!-- ── NAV ── -->
@@ -291,10 +339,11 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
         <path d="M15.5 11 Q16.5 7.8 17.5 6.2" stroke="#c9aa70" stroke-width=".7" fill="none" opacity=".22"/>
       </svg>
       <span class="logo-name">coffeeOS</span>
-      <span class="logo-ver">Aurora v1.3</span>
+      <span class="logo-ver">Aurora v1.4</span>
     </a>
     <ul id="nav-links">
       <li><a href="#features">Features</a></li>
+      <li><a href="#changelog">Changelog</a></li>
       <li><a href="#build">Build</a></li>
       <li><a href="#specs">Specs</a></li>
       <li><a href="#roadmap">Roadmap</a></li>
@@ -310,9 +359,9 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
   </div>
 </nav>
 
-<!-- Mobile menu -->
 <div class="mobile-menu z" id="mobile-menu">
   <a href="#features" onclick="closeMobileMenu()">Features</a>
+  <a href="#changelog" onclick="closeMobileMenu()">Changelog</a>
   <a href="#build" onclick="closeMobileMenu()">Build</a>
   <a href="#specs" onclick="closeMobileMenu()">Specs</a>
   <a href="#roadmap" onclick="closeMobileMenu()">Roadmap</a>
@@ -325,9 +374,13 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
   <div class="container">
     <div class="hero-grid">
       <div>
+        <div class="new-badge">
+          <span class="new-badge-dot"></span>
+          v1.4.0 now available — compositor stability
+        </div>
         <p class="eyebrow">32-bit x86 hobby OS — open source</p>
-        <h1>coffee<span class="acc">OS</span></h1>
-        <p class="hero-sub">Aurora Refresh v1.3</p>
+        <h1><span class="glitch" data-text="coffee">coffee</span><span class="acc">OS</span></h1>
+        <p class="hero-sub">Aurora Refresh v1.4</p>
         <p class="hero-p">
           A 32-bit x86 hobby kernel in C and assembly. Higher-half paging,
           a framebuffer desktop with real windowed apps, FAT32 persistence,
@@ -343,12 +396,11 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
         </div>
       </div>
 
-      <!-- Animated terminal -->
       <div class="term-wrap">
         <div class="terminal">
           <div class="t-bar">
             <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
-            <span class="t-bar-title">coffeeOS — tty0 @ Aurora Refresh v1.3</span>
+            <span class="t-bar-title">coffeeOS — tty0 @ Aurora Refresh v1.4</span>
           </div>
           <div class="t-body" id="terminal-body">
             <span class="t-ln" id="cursor-line"><span class="cur"></span></span>
@@ -365,11 +417,11 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
 <div class="stats z">
   <div class="container">
     <div class="stats-grid reveal">
-      <div class="stat"><span class="stat-n" data-count="17000" data-suffix="+" data-prefix="">17k+</span><span class="stat-l">Lines of Code</span></div>
-      <div class="stat"><span class="stat-n">76</span><span class="stat-l">Source Files</span></div>
-      <div class="stat"><span class="stat-n">8</span><span class="stat-l">Built-in Apps</span></div>
+      <div class="stat"><span class="stat-n" data-count="17000">0</span><span class="stat-l">Lines of Code</span></div>
+      <div class="stat"><span class="stat-n" data-count="76">0</span><span class="stat-l">Source Files</span></div>
+      <div class="stat"><span class="stat-n" data-count="8">0</span><span class="stat-l">Built-in Apps</span></div>
       <div class="stat"><span class="stat-n">FAT32</span><span class="stat-l">Filesystem</span></div>
-      <div class="stat"><span class="stat-n">v1.3</span><span class="stat-l">Current Release</span></div>
+      <div class="stat"><span class="stat-n">v1.4</span><span class="stat-l">Current Release</span></div>
     </div>
   </div>
 </div>
@@ -385,46 +437,55 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
       <p class="sec-p">Aurora Refresh ships a real desktop, real apps, real persistence, and real hardware drivers — freestanding, -nostdlib, no shortcuts.</p>
     </div>
     <div class="feat-grid reveal">
-      <div class="feat">
+
+      <div class="feat" style="--feat-accent:var(--ag);--feat-glow:rgba(61,255,192,.05);">
         <div class="feat-ico"><svg viewBox="0 0 34 34" fill="none"><rect x="3" y="5" width="28" height="20" rx="2.5" stroke="#3dffc0" stroke-width="1.1"/><path d="M8 18 L11 14 L15 20 L19 12 L23 18 L26 16" stroke="#3dffc0" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <h3>Higher-half Kernel</h3>
         <p>GDT, TSS, IDT, paging, PMM and VMM layers. GRUB2 Multiboot2 entry. Runs entirely above the 3 GB virtual mark.</p>
       </div>
-      <div class="feat">
+
+      <div class="feat" style="--feat-accent:var(--crema);--feat-glow:rgba(201,170,112,.05);">
         <div class="feat-ico"><svg viewBox="0 0 34 34" fill="none"><rect x="4" y="4" width="12" height="9" rx="1.5" stroke="#c9aa70" stroke-width="1.1"/><rect x="18" y="4" width="12" height="9" rx="1.5" stroke="#c9aa70" stroke-width="1.1"/><rect x="4" y="17" width="12" height="9" rx="1.5" stroke="#c9aa70" stroke-width="1.1"/><rect x="18" y="17" width="12" height="9" rx="1.5" stroke="#c9aa70" stroke-width=".8" opacity=".35"/><path d="M16 8.5H18 M16 21.5H18 M10 13V17 M24 13V17" stroke="#c9aa70" stroke-width=".8" opacity=".4"/></svg></div>
         <h3>Framebuffer Desktop</h3>
         <p>Movable windows, icons, taskbar, and app launcher over a linear framebuffer compositor with double-buffering.</p>
       </div>
-      <div class="feat">
+
+      <div class="feat" style="--feat-accent:var(--ap);--feat-glow:rgba(181,122,255,.05);">
         <div class="feat-ico"><svg viewBox="0 0 34 34" fill="none"><rect x="5" y="8" width="10" height="7" rx="1.5" stroke="#b57aff" stroke-width="1.1"/><rect x="19" y="8" width="10" height="7" rx="1.5" stroke="#b57aff" stroke-width="1.1"/><rect x="5" y="19" width="10" height="7" rx="1.5" stroke="#b57aff" stroke-width="1.1"/><rect x="19" y="19" width="10" height="7" rx="1.5" stroke="#00e5ff" stroke-width="1.1"/><path d="M10 8V6 M24 8V6 M10 26V28 M24 26V28" stroke="#b57aff" stroke-width=".8" opacity=".5"/></svg></div>
         <h3>Built-in App Suite</h3>
         <p>Notepad (Ctrl+S/N/O), Paint, Calculator, Clock, Mixer, System Info, Files — all running natively in coffeeOS.</p>
       </div>
-      <div class="feat">
+
+      <div class="feat" style="--feat-accent:var(--at);--feat-glow:rgba(0,229,255,.05);">
         <div class="feat-ico"><svg viewBox="0 0 34 34" fill="none"><path d="M5 29 L5 5 L29 29 Z" stroke="#00e5ff" stroke-width="1.1" fill="none" stroke-linejoin="round" opacity=".5"/><circle cx="17" cy="17" r="5.5" stroke="#00e5ff" stroke-width="1.1" fill="none"/><path d="M17 11.5 V8 M17 22.5 V26 M11.5 17 H8 M22.5 17 H26" stroke="#00e5ff" stroke-width=".8" opacity=".35"/></svg></div>
         <h3>FAT32 + VFS</h3>
         <p>Full FAT32 read/write with sector cache, MBR parsing, VFS layer, ATA PIO disk driver, and ramdisk boot image.</p>
       </div>
-      <div class="feat">
+
+      <div class="feat" style="--feat-accent:var(--ap);--feat-glow:rgba(181,122,255,.05);">
         <div class="feat-ico"><svg viewBox="0 0 34 34" fill="none"><path d="M8 28 Q8 10 17 10 Q26 10 26 28" stroke="#b57aff" stroke-width="1.1" fill="none" stroke-linecap="round"/><circle cx="17" cy="26" r="3.5" fill="rgba(181,122,255,.1)" stroke="#b57aff" stroke-width="1.1"/><path d="M6 17 H4 M28 17 H30" stroke="#b57aff" stroke-width=".8" opacity=".4"/></svg></div>
         <h3>RTL8139 Network</h3>
         <p>RTL8139 NIC driver with QEMU user networking. Attached automatically on <code style="color:var(--ag);font-size:.66rem;">just run-persist</code> targets.</p>
       </div>
-      <div class="feat">
+
+      <div class="feat" style="--feat-accent:var(--crema);--feat-glow:rgba(201,170,112,.05);">
         <div class="feat-ico"><svg viewBox="0 0 34 34" fill="none"><rect x="5" y="12" width="24" height="14" rx="2" stroke="#c9aa70" stroke-width="1.1"/><path d="M11 8 L11 12 M17 7 L17 12 M23 8 L23 12" stroke="#c9aa70" stroke-width="1.1" stroke-linecap="round" opacity=".5"/><path d="M9 19 Q11 16 13 19 Q15 22 17 19 Q19 16 21 19 Q23 22 25 19" stroke="#3dffc0" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg></div>
         <h3>SB16 Audio</h3>
         <p>Sound Blaster 16 DMA audio path with automatic PC speaker fallback. Controlled via Mixer app and syscall interface.</p>
       </div>
-      <div class="feat">
+
+      <div class="feat" style="--feat-accent:var(--crema);--feat-glow:rgba(201,170,112,.05);">
         <div class="feat-ico"><svg viewBox="0 0 34 34" fill="none"><rect x="5" y="8" width="24" height="16" rx="2" stroke="#c9aa70" stroke-width="1.1" fill="none"/><path d="M10 18 L13 15 L17 21" stroke="#3dffc0" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M18 18 H24" stroke="rgba(201,170,112,.4)" stroke-width="1.1" stroke-linecap="round"/><path d="M9 24 V28 M17 24 V28 M25 24 V28" stroke="#c9aa70" stroke-width=".7" opacity=".35"/></svg></div>
         <h3>Kernel Shell</h3>
         <p>Shared dispatcher for the kernel shell and GUI terminal: ls, cat, write, mkdir, rm, cp, mv, stat, df, touch, edit, sync.</p>
       </div>
-      <div class="feat">
+
+      <div class="feat" style="--feat-accent:var(--at);--feat-glow:rgba(0,229,255,.05);">
         <div class="feat-ico"><svg viewBox="0 0 34 34" fill="none"><rect x="6" y="9" width="22" height="16" rx="2" stroke="#00e5ff" stroke-width="1.1"/><path d="M11 17 L14 14 L18 20 L21 16" stroke="#00e5ff" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 25 Q17 27 28 25" stroke="#00e5ff" stroke-width=".7" fill="none" opacity=".35"/></svg></div>
         <h3>Syscall Plumbing</h3>
         <p>Userland syscall dispatch wired through the kernel. Covers filesystem, I/O, and process-level operations.</p>
       </div>
+
     </div>
     <div class="reveal" style="margin-top:2.5rem;">
       <p class="sec-eye" style="margin-bottom:.8rem;">Built-in applications</p>
@@ -438,6 +499,84 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
         <div class="app-chip"><div class="app-dot"></div>Files</div>
         <div class="app-chip"><div class="app-dot"></div>Terminal</div>
       </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── CHANGELOG ── -->
+<section id="changelog" class="z" style="background:rgba(16,10,5,.5);">
+  <div class="container">
+    <div class="reveal">
+      <p class="sec-eye">Release history</p>
+      <h2>What's <em>changed</em></h2>
+      <p class="sec-p">Every version of Aurora Refresh, from first boot to compositor stability.</p>
+    </div>
+    <div class="cl-list reveal">
+
+      <div class="cl-item">
+        <div class="cl-ver now">
+          <strong>v1.4</strong>
+          current
+        </div>
+        <div class="cl-changes">
+          <div class="cl-line"><span class="cl-tag fix">fix</span>Resolved desktop cursor imprint bug caused by redraw ordering during idle clock/taskbar updates</div>
+          <div class="cl-line"><span class="cl-tag fix">fix</span>Fixed stale cursor background capture — forces self-erase before re-saving cursor backing pixels</div>
+          <div class="cl-line"><span class="cl-tag fix">fix</span>Added idle cursor redraw/present fallback so cursor does not disappear after an erase-only frame</div>
+          <div class="cl-line"><span class="cl-tag upd">upd</span>Refreshed top-level documentation and architecture notes covering boot flow &amp; compositor behavior</div>
+          <div class="cl-line"><span class="cl-tag upd">upd</span>Updated app documentation to better describe the redraw contract between app callbacks and compositor</div>
+        </div>
+      </div>
+
+      <div class="cl-item">
+        <div class="cl-ver">
+          <strong>v1.3</strong>
+          Aurora Refresh
+        </div>
+        <div class="cl-changes">
+          <div class="cl-line"><span class="cl-tag new">new</span>Full built-in app suite — Notepad, Paint, Calculator, Clock, Mixer, System Info, Files, Terminal</div>
+          <div class="cl-line"><span class="cl-tag new">new</span>SB16 DMA audio driver with PC speaker fallback and Mixer app control</div>
+          <div class="cl-line"><span class="cl-tag new">new</span>RTL8139 NIC driver with QEMU user networking attached on run-persist targets</div>
+          <div class="cl-line"><span class="cl-tag new">new</span>Userland syscall dispatch wired through the kernel for FS, I/O, and process operations</div>
+          <div class="cl-line"><span class="cl-tag new">new</span>Windows VHD workflow — persist.img ↔ persist.vhd conversion via justfile</div>
+          <div class="cl-line"><span class="cl-tag new">new</span>COM1 serial kernel debug logging &amp; PS/2 mouse driver support</div>
+        </div>
+      </div>
+
+      <div class="cl-item">
+        <div class="cl-ver">
+          <strong>v1.2</strong>
+          Desktop
+        </div>
+        <div class="cl-changes">
+          <div class="cl-line"><span class="cl-tag new">new</span>Linear framebuffer compositor with movable windows, taskbar, icons, and app launcher</div>
+          <div class="cl-line"><span class="cl-tag new">new</span>FAT32 read/write driver with MBR parsing, sector cache, VFS layer, and ATA PIO disk</div>
+          <div class="cl-line"><span class="cl-tag new">new</span>Double-buffered rendering pipeline</div>
+        </div>
+      </div>
+
+      <div class="cl-item">
+        <div class="cl-ver">
+          <strong>v1.1</strong>
+          Memory
+        </div>
+        <div class="cl-changes">
+          <div class="cl-line"><span class="cl-tag new">new</span>Higher-half kernel mapping — runs entirely above the 3 GB virtual mark</div>
+          <div class="cl-line"><span class="cl-tag new">new</span>PMM bitmap allocator, VMM layer, heap allocator, and TSS setup</div>
+        </div>
+      </div>
+
+      <div class="cl-item">
+        <div class="cl-ver">
+          <strong>v1.0</strong>
+          Foundation
+        </div>
+        <div class="cl-changes">
+          <div class="cl-line"><span class="cl-tag new">new</span>GRUB2 Multiboot2 boot entry, GDT, IDT, VGA text mode, PS/2 keyboard, PIT timer</div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -523,7 +662,7 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
         <h2>Under the <em>hood</em></h2>
         <p class="sec-p" style="margin-bottom:2rem;">Every byte handwritten. No libc, no magic.</p>
         <div class="spec-table">
-          <div class="spec-row"><div class="sk">Version</div><div class="sv"><span class="tag tag-a">v1.3</span>Aurora Refresh</div></div>
+          <div class="spec-row"><div class="sk">Version</div><div class="sv"><span class="tag tag-a">v1.4</span>Aurora Refresh</div></div>
           <div class="spec-row"><div class="sk">Architecture</div><div class="sv">x86 32-bit protected mode</div></div>
           <div class="spec-row"><div class="sk">Languages</div><div class="sv"><span class="tag tag-g">C</span><span class="tag tag-g">ASM</span>x86 NASM</div></div>
           <div class="spec-row"><div class="sk">Boot</div><div class="sv"><span class="tag tag-t">GRUB2</span>Multiboot2, higher-half</div></div>
@@ -561,12 +700,16 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
             <div><p class="rm-tag">v1.2 — done</p><p class="rm-name">Framebuffer Desktop + FAT32</p><p class="rm-desc">Linear framebuffer, windowing system, VFS, FAT32 driver, ATA PIO.</p></div>
           </div>
           <div class="rm-item">
+            <div class="rm-dot done"></div>
+            <div><p class="rm-tag">v1.3 — done</p><p class="rm-name">Apps, Audio, Networking &amp; Syscalls</p><p class="rm-desc">Full app suite, SB16 audio, RTL8139, userland syscall dispatch, Windows VHD workflow, serial logging, mouse support.</p></div>
+          </div>
+          <div class="rm-item">
             <div class="rm-dot now"></div>
-            <div><p class="rm-tag">v1.3 — current — Aurora Refresh</p><p class="rm-name">Apps, Audio, Networking &amp; Syscalls</p><p class="rm-desc">Full app suite, SB16 audio, RTL8139, userland syscall dispatch, Windows VHD workflow, serial logging, mouse support.</p></div>
+            <div><p class="rm-tag">v1.4 — current</p><p class="rm-name">Compositor Stability &amp; Docs</p><p class="rm-desc">Cursor imprint fix, idle redraw fallback, architecture documentation refresh.</p></div>
           </div>
           <div class="rm-item">
             <div class="rm-dot"></div>
-            <div><p class="rm-tag">v1.4 — planned</p><p class="rm-name">Preemptive Scheduler</p><p class="rm-desc">True multitasking with context switching, TCBs, round-robin priority queue.</p></div>
+            <div><p class="rm-tag">v1.5 — planned</p><p class="rm-name">Preemptive Scheduler</p><p class="rm-desc">True multitasking with context switching, TCBs, round-robin priority queue.</p></div>
           </div>
           <div class="rm-item">
             <div class="rm-dot"></div>
@@ -612,7 +755,7 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
             @its_rayan2580
           </a>
         </div>
-        <span class="credit-badge tester">Aurora Refresh v1.3</span>
+        <span class="credit-badge tester">Aurora Refresh v1.4</span>
       </div>
 
       <div class="credit-card">
@@ -624,7 +767,7 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
             Pre-release Program
           </span>
         </div>
-        <span class="credit-badge alpha">Aurora Refresh v1.3 — Pre-release</span>
+        <span class="credit-badge alpha">Aurora Refresh v1.4 — Pre-release</span>
       </div>
 
     </div>
@@ -664,7 +807,7 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
           </svg>
           <span class="foot-logo-name">coffeeOS</span>
         </div>
-        <p class="foot-desc">A 32-bit x86 hobby OS brewed from scratch by Johan Joseph. Aurora Refresh v1.3. Open source, freestanding, -nostdlib.</p>
+        <p class="foot-desc">A 32-bit x86 hobby OS brewed from scratch by Johan Joseph. Aurora Refresh v1.4. Open source, freestanding, -nostdlib.</p>
       </div>
       <div class="foot-cols">
         <div class="foot-col">
@@ -677,6 +820,7 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
         <div class="foot-col">
           <h4>Sections</h4>
           <a href="#features">Features</a>
+          <a href="#changelog">Changelog</a>
           <a href="#build">Build</a>
           <a href="#specs">Specs</a>
           <a href="#roadmap">Roadmap</a>
@@ -691,7 +835,7 @@ footer{border-top:1px solid var(--border);padding:3rem 0 2.5rem;}
       </div>
     </div>
     <div class="foot-bottom">
-      <span class="foot-note">coffeeOS Aurora Refresh v1.3 — nikolai-core — freestanding, -nostdlib</span>
+      <span class="foot-note">coffeeOS Aurora Refresh v1.4 — nikolai-core — freestanding, -nostdlib</span>
       <span class="foot-credit">
         Created by <a href="https://www.instagram.com/johannnnn._/" target="_blank">Johan Joseph</a>
         &nbsp;·&nbsp;
@@ -710,10 +854,10 @@ let W,H,tick=0;
 const resize=()=>{W=cvs.width=innerWidth;H=cvs.height=innerHeight;};
 resize();addEventListener('resize',resize);
 const bands=[
-  {y:.22,amp:.055,freq:.0009,spd:.00011,rgb:[61,255,192],op:.042},
-  {y:.32,amp:.048,freq:.0013,spd:.00009,rgb:[0,229,255],op:.032},
-  {y:.14,amp:.038,freq:.0007,spd:.00014,rgb:[181,122,255],op:.028},
-  {y:.42,amp:.028,freq:.0016,spd:.00007,rgb:[79,200,255],op:.022},
+  {y:.22,amp:.055,freq:.0009,spd:.00011,rgb:[61,255,192],op:.048},
+  {y:.32,amp:.048,freq:.0013,spd:.00009,rgb:[0,229,255],op:.036},
+  {y:.14,amp:.038,freq:.0007,spd:.00014,rgb:[181,122,255],op:.030},
+  {y:.42,amp:.028,freq:.0016,spd:.00007,rgb:[79,200,255],op:.024},
 ];
 function drawAurora(){
   cx.clearRect(0,0,W,H);
@@ -755,6 +899,29 @@ const obs=new IntersectionObserver(es=>es.forEach(e=>{
 }),{threshold:.07,rootMargin:'0px 0px -40px 0px'});
 document.querySelectorAll('.reveal,.reveal-l').forEach(el=>obs.observe(el));
 
+/* ── ANIMATED COUNTERS ── */
+function animateCount(el){
+  const target=parseInt(el.dataset.count);
+  const start=performance.now();
+  const dur=1400;
+  const fmt=n=>n>=1000?Math.round(n/1000)+'k+':Math.round(n)+'';
+  function tick(now){
+    const t=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-t,4);
+    el.textContent=fmt(ease*target);
+    if(t<1)requestAnimationFrame(tick);
+    else el.textContent=fmt(target);
+  }
+  requestAnimationFrame(tick);
+}
+const countObs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){
+    e.target.querySelectorAll('[data-count]').forEach(animateCount);
+    countObs.unobserve(e.target);
+  }
+}),{threshold:.4});
+document.querySelectorAll('.stats-grid').forEach(el=>countObs.observe(el));
+
 /* ── ACTIVE NAV LINKS ── */
 const sections=document.querySelectorAll('section[id],div[id]');
 const navLinks=document.querySelectorAll('nav ul a');
@@ -787,7 +954,7 @@ function copyBlock(btn,text){
 /* ── TYPEWRITER TERMINAL ── */
 const lines=[
   {type:'cmd', prompt:true, text:'just run-persist'},
-  {type:'dim', text:'  Booting coffeeOS Aurora Refresh v1.3...'},
+  {type:'dim', text:'  Booting coffeeOS Aurora Refresh v1.4...'},
   {type:'dim', text:'  Multiboot OK | higher-half kernel mapped'},
   {type:'dim', text:'  GDT / TSS / IDT loaded'},
   {type:'dim', text:'  PMM: 128 MB detected | paging enabled'},
@@ -795,6 +962,7 @@ const lines=[
   {type:'dim', text:'  FAT32: volume mounted at /'},
   {type:'ok',  text:'  ✓ RTL8139   QEMU user net up'},
   {type:'ok',  text:'  ✓ SB16      DMA channels ready'},
+  {type:'ok',  text:'  ✓ Cursor    compositor fix v1.4'},
   {type:'crema',text:'  ☕ desktop loading...'},
   {type:'blank'},
   {type:'cmd', prompt:true, text:'ls /apps'},
@@ -804,7 +972,7 @@ const lines=[
 
 const body=document.getElementById('terminal-body');
 let lineIdx=0,charIdx=0;
-const CHAR_SPEED=28,LINE_PAUSE=180,PROMPT_PAUSE=380;
+const CHAR_SPEED=26,LINE_PAUSE=170,PROMPT_PAUSE=360;
 
 function colorClass(type){
   const m={cmd:'pc',dim:'pd',ok:'pg',cyan:'pt',crema:'pa'};
@@ -824,7 +992,6 @@ function nextLine(){
     lineIdx++;charIdx=0;setTimeout(nextLine,80);return;
   }
   if(charIdx===0){
-    // remove old cursor line, create new line
     const old=document.getElementById('cursor-line');if(old)old.remove();
     const s=document.createElement('span');s.className='t-ln';s.id='cursor-line';
     if(l.prompt)s.innerHTML='<span class="pr">root@coffeeOS</span><span class="pd">:</span><span class="pt">~</span><span class="pd">$ </span><span id="tw-text" class="pc"></span><span class="cur"></span>';
